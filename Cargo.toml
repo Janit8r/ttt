@@ -1,27 +1,28 @@
 [package]
 name = "iptv-proxy"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["IPTV Proxy Team"]
 
+[features]
+default = ["server"]
+# Pure rewriting/HTTP policy tests also run on Windows with --no-default-features.
+server = ["dep:pingora", "dep:async-trait", "dep:log", "dep:env_logger"]
+
+[[bin]]
+name = "iptv-proxy"
+path = "src/main.rs"
+required-features = ["server"]
+
 [dependencies]
-# pingora 使用 Git 提交 d9e6d7a，已兼容 sfv，无需锁定
-pingora = { git = "https://github.com/cloudflare/pingora", rev = "d9e6d7a", default-features = false, features = ["lb", "rustls"] }
-pingora-core = { git = "https://github.com/cloudflare/pingora", rev = "d9e6d7a", default-features = false }
-async-trait = "0.1"
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync"] }
-reqwest = { version = "0.11", default-features = false, features = ["rustls-tls"] }
+pingora = { git = "https://github.com/cloudflare/pingora", rev = "d9e6d7a", default-features = false, features = ["proxy", "rustls"], optional = true }
+async-trait = { version = "0.1", optional = true }
 bytes = "1"
 url = "2"
-regex = "1"
-once_cell = "1"
-log = "0.4"
-env_logger = "0.11"
-ahash = "0.8"
-memchr = "2"
-num_cpus = "1"
+log = { version = "0.4", optional = true }
+env_logger = { version = "0.11", optional = true }
 http = "1"
-urlencoding = "2"          # 新增，用于编解码代理 URL
+urlencoding = "2"
 
 [profile.release]
 opt-level = 3
@@ -31,4 +32,4 @@ strip = true
 panic = "abort"
 
 [profile.release.package."*"]
-opt-level = 3 
+opt-level = 3
